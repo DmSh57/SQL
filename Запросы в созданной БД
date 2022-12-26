@@ -1,0 +1,93 @@
+1.UPDATE 
+
+UPDATE classroom SET number_classroom = 57
+WHERE number_classroom = 135;
+
+2. WHERE + IN
+SELECT full_name, date_of_birth 
+FROM teacher t 
+WHERE address IN ('улица Петрова 12');
+
+3. ORDER BY 
+
+SELECT full_name, date_of_birth, address
+FROM teacher 
+ORDER BY full_name;
+
+4. ORDER BY DESC 
+
+SELECT full_name, date_of_birth, tel_number 
+FROM student 
+ORDER BY full_name DESC;
+
+5. LIKE 
+
+SELECT * FROM teacher t  
+WHERE full_name LIKE '%а';
+
+6. MIN 
+
+SELECT semester, MIN (score) AS min_score
+FROM results r 
+GROUP BY semester;
+
+7. AVG
+
+SELECT AVG(score) AS mid_score
+FROM results r ;
+
+8. DELETE 
+
+DELETE FROM teacher 
+WHERE full_name = 'Максимов Денис НИколаевич';
+
+9. COUNT (*)
+
+SELECT COUNT(*) AS total_student
+FROM student s;
+
+10. ORDER BY + LIMIT 
+
+SELECT *
+FROM teacher t 
+ORDER BY date_of_birth 
+LIMIT 1;
+
+11. CROSS JOIN 
+
+SELECT full_name, score 
+FROM 
+	student s CROSS JOIN results r;
+
+12. WHERE + OR
+
+SELECT *
+FROM teacher t 
+WHERE full_name = 'Перевалов Евгений Евгеньевич'
+OR date_of_birth = '1980-10-12'; 
+
+13. WHERE + NOT 
+
+SELECT *
+FROM teacher t 
+WHERE NOT full_name = 'Перевалов Евгений Евгеньевич';
+
+14. BETWEEN 
+
+SELECT full_name, score 
+FROM 
+	student s CROSS JOIN results r
+WHERE score BETWEEN 3 AND 4;
+
+15. MIN, MAX
+
+SELECT full_name, MIN (score) AS min_score, MAX (score) AS max_score
+FROM 
+	student s CROSS JOIN results r
+GROUP BY full_name;
+ 
+
+
+
+
+
