@@ -1,0 +1,250 @@
+Задание №2.1
+Напишите запрос, выводящий для всех заказов из таблицы ORDERS их дату (odate), номер (onum) и стоимость (amt) без сортировки.
+Обратите внимание, что заглавными буквами в этой схеме пишутся все названия таблиц.
+
+ЗАПРОС:
+SELECT odate, onum, amt FROM ORDERS o 
+
+Задание №2.2
+Напишите запрос, выводящий все строки для продавцов с номером (snum), большим чем 1005 (таблица SALES), сортировать не нужно.
+
+ЗАПРОС:
+SELECT * FROM SALES s 
+WHERE snum > 1005;
+
+Задание №2.3
+Напишите запрос, выводящий всю информацию о заказах, оформленных в промежутке с 10 марта 2014 (2014-03-10) по 10 апреля 2017 (таблица ORDERS).
+Делается через BETWEEN, сортировка по дате по убыванию (ORDER BY 2 DESC).
+
+ЗАПРОС:
+SELECT * FROM ORDERS o 
+WHERE ODATE BETWEEN TO_DATE('2014-03-10', 'YYYY-MM-DD') AND TO_DATE('2017-04-10', 'YYYY-MM-DD')  ORDER BY 2 DESC;
+
+Задание №2.4
+Напишите запрос, выводящий в алфавитном порядке имена всех покупателей из города ‘San Jose’ (таблица CLIENTS)
+
+ЗАПРОС:
+SELECT * FROM CLIENTS c WHERE CITY IN ('SAN JOSE') ORDER BY CNAME;
+
+Задание №2.5
+Напишите запрос, выводящий всю информацию по заказам с номером 3000, 3004 или 3005 (таблица ORDERS) [через IN], сортировка по возрастанию номера заказа (onum).
+
+ЗАПРОС:
+SELECT * FROM ORDERS o WHERE ONUM IN (3000, 3004, 3005) ORDER BY ONUM;
+
+Задание №2.6
+Напишите запрос, выводящий всю информацию о покупателях, проживающих в городах, не начинающихся с S, чей рейтинг больше 200 (таблица Clients), сортировка не нужна
+
+ЗАПРОС:
+SELECT * FROM CLIENTS c WHERE CITY NOT LIKE ('S%') AND RATING > 200; 
+
+Задание №2.7
+Напишите запрос, выводящий для всех заказов два столбца: номер и стоимость (amt), округленная до целого. Сортировка по возрастанию номера заказа.
+
+ЗАПРОС:
+SELECT ONUM, ROUND(AMT) FROM ORDERS o ORDER BY ONUM; 
+
+Задание №2.8
+Напишите запрос, выводящий имя и город проживания продавцов, причем если город не задан (т.е. null), 
+выводить «не задан» вместо null [назвать итоговый столбец с городом result]. Сортировка по имени в алфавитном порядке.
+
+ЗАПРОС:
+SELECT sname, NVL(CITY, 'не задан') AS results FROM SALES s ORDER BY SNAME;
+
+Задание №2.9
+Напишите запрос, выводящий один столбец со строками вида "Рейтинг покупателя ISMAEL равен 55 (низкий)" и т.д. для всех записей таблицы Clients,
+при этом имя покупателя должно быть выведено большими буквами.
+В конце строки в скобках указать «высокий» - если рейтинг выше 200, «средний» - если равен 200 и «низкий» – во всех остальных случаях. 
+Без дополнительной сортировки.
+
+ЗАПРОС:
+SELECT 'Рейтинг покупателя' || ' ' || UPPER(CNAME) || ' ' || 'равен' || ' ' || RATING || ' ' || 
+	CASE 
+		WHEN RATING  > 200 then '(высокий)' 
+		WHEN RATING  = 200 then '(средний)' 
+		ELSE '(низкий)' 
+		END
+	FROM CLIENTS c;
+
+Задание №2.10
+Напишите запрос, выводящий общее количество сделанных заказов.
+
+ЗАПРОС:
+SELECT COUNT(*) FROM ORDERS o  
+
+Задание №2.11
+Напишите запрос, выводящий среднюю длину имени покупателя. Округлять не нужно.
+
+ЗАПРОС:
+SELECT ROUND(AVG(LENGTH(SNAME))) FROM SALES s 
+
+Задание №2.12
+Напишите запрос, выводящий дату и максимальную стоимость заказа за эту дату, отсортированные по убыванию максимальной стоимости заказа.
+
+ЗАПРОС:
+SELECT ODATE, MAX(AMT) 
+FROM ORDERS o 
+GROUP BY ODATE 
+ORDER BY MAX(AMT) DESC;
+
+Задание №2.13 
+Напишите запрос, выводящий названия городов, в которых суммарный рейтинг покупателей превышает 100. 
+Столбца должно быть два: город и суммарный рейтинг, сортировка по возрастанию суммарного рейтинга.
+
+ЗАПРОС:
+SELECT CITY, SUM(RATING)
+FROM CLIENTS c 
+GROUP BY CITY
+HAVING SUM(RATING) > 100
+ORDER BY SUM(RATING);
+
+Задание №3.1
+Написать запрос, выводящий в первой колонке имена продавцов и во второй соответствующие им имена клиентов,
+в том числе для продавцов без клиентов. Distinct и order by не использовать.
+
+ЗАПРОС:
+SELECT SNAME, CNAME FROM SALES s
+LEFT OUTER JOIN CLIENTS c ON s.snum = c.snum;
+
+Задание №3.2
+Написать запрос, выводящий имя и номер каждого продавца, имеющего клиентов в Лондоне (London), Москве (Moscow) или Сочи (Sochi). 
+Продавцы должны быть отсортированы по возрастанию номера и не должны повторяться.
+
+ЗАПРОС:
+SELECT DISTINCT  s.sname, s.snum FROM SALES s 
+RIGHT JOIN CLIENTS c ON s.snum = c.snum
+WHERE c.city IN ('London', 'Moscow', 'Sochi') ORDER BY s.snum;
+
+Задание №3.3 
+Написать запрос, выводящий строки, показывающие всю информацию о тех продавцах (snum, sname, city, comm) и их клиентах (cnum, cname, city, rating, snum), которые живут в одном и том же городе. 
+Сортировка выполняется по sales.snum, clients.snum по возрастанию, дубликаты можно не убирать. 
+Столбцов вывода может быть 9: (snum, sname, city, comm, cnum, cname, city, rating, snum) или 7, как удобнее (snum, city, sname, comm, cnum, cname, rating)
+
+ЗАПРОС:
+SELECT sales.sname, clients.cname, sales.city, sales.comm, clients.cnum, clients.rating, sales.snum, clients.snum 
+FROM SALES
+JOIN CLIENTS ON sales.snum = clients.snum;
+
+Задание 4.1
+Написать запрос, выводящий имя продавца и общую сумму, на которую продавец сделал продажи, отсортированные по убыванию суммы [группировать продавцов по атрибуту (snum); 
+использовать WITH. Null-значения выводить не нужно.
+
+ЗАПРОС:
+WITH sales_order_sum (snum, summa)
+AS
+(SELECT snum, SUM(AMT) AS summa FROM ORDERS o 
+GROUP BY snum)
+SELECT SNUM, summa FROM sales_order_sum
+WHERE summa > 1 ORDER BY summa DESC;
+
+Задание 4.2
+Написать запрос, выводящий вторую, третью и четвертую строку из таблицы SALES. Доп.сортировка не нужна.
+
+ЗАПРОС: 
+SELECT *
+  FROM SALES s
+  WHERE ROWNUM < 5
+  MINUS
+  select * from SALES s2 WHERE ROWNUM<=1;
+  
+Задание 4.3
+Написать запрос, выводящие номера и комиссии продавцов, имеющих комиссию выше средней и имеющих хотя бы одну продажу. Сортировать по возрастанию номера.
+
+ЗАПРОС: 
+SELECT snum, comm FROM SALES WHERE comm >
+(SELECT AVG(COMM) FROM SALES WHERE comm > 0)
+ORDER BY SNUM;
+
+Задание 4.4. 
+Написать запрос, выводящий общее количество продавцов и покупателей (подсчет происходит по столбцу SNUM у продавцов и по CNUM у клиентов) из каждого города (использовать UNION ALL), 
+отсортированное в первую очередь по убыванию количества, а во вторую очередь по алфавитному порядку в названиях городов (order by 2 desc, 1). Колонки вывода: город и общее количество продавцов и клиентов.
+
+ЗАПРОС:
+SELECT CITY, SUM(total) AS total_sum FROM (
+  SELECT COUNT(SNUM) AS total, CITY  FROM SALES GROUP BY CITY
+  UNION ALL 
+  SELECT COUNT(CNUM) AS total, CITY  FROM CLIENTS GROUP BY CITY 
+)
+GROUP BY CITY
+ORDER BY total_sum DESC, CITY;
+
+Задание 4.5
+Написать запрос, выводящий имена и номера всех продавцов, которые имеют одного или более покупателей (использовать EXISTS, JOIN не обязателен).
+
+ЗАПРОС:
+SELECT SNUM, SNAME FROM SALES s 
+WHERE EXISTS 
+(SELECT* FROM CLIENTS c
+WHERE s.SNUM = c.SNUM);
+
+Задание 4.6
+Написать запрос, выводящий snum, city, comm всех продавцов, имеющих комиссию не ниже средней по своему городу. 
+Отсортировать по возрастанию snum.
+
+ЗАПРОС:
+SELECT SALES.SNUM, SALES.CITY, SALES.COMM FROM SALES 
+JOIN CLIENTS ON SALES.SNUM = CLIENTS.SNUM 
+JOIN ORDERS ON CLIENTS.SNUM = ORDERS.SNUM
+WHERE SALES.COMM >=
+(SELECT AVG(SALES.COMM) FROM SALES)
+GROUP BY SALES.SNUM, SALES.CITY, SALES.COMM
+ORDER BY SALES.SNUM;
+
+Задание 4.7
+Написать запрос, выводящий подзапросом (без джойна) номера и имена всех продавцов, имеющих в своем городе заказчиков, которых они не обслуживают. 
+Сортировка по возрастанию SNUM, дубликаты должны быть исключены.
+
+ЗАПРОС:
+SELECT SNUM, SNAME FROM SALES s 
+WHERE EXISTS 
+(SELECT* FROM CLIENTS c
+WHERE s.SNUM <> c.SNUM AND s.CITY = c.CITY);
+
+Задание 4.8
+Написать запрос, выводящий [join’ом] номера и имена всех продавцов, имеющих в своем городе заказчиков, которых они не обслуживают. 
+Сортировка по возрастанию SNUM, дубликаты должны быть исключены.
+
+ЗАПРОС:
+SELECT DISTINCT SALES.SNUM, SALES.SNAME FROM SALES 
+JOIN CLIENTS ON SALES.SNUM <> CLIENTS.SNUM 
+WHERE SALES.CITY = CLIENTS.CITY
+ORDER BY SALES.SNUM;
+
+Задание 4.9
+Написать запрос, выводящий номера всех заказов, а также разницу между стоимостью каждого заказа и средней стоимостью заказа за тот же день (округленную до сотых). 
+Distinct использовать не нужно, сортировка по номеру заказа по возрастанию.
+
+ЗАПРОС:
+WITH RAZ (ODATE, diff) 
+AS
+(SELECT ODATE,  ROUND(AVG(AMT), 2) AS diff FROM ORDERS
+WHERE snum IS NOT NULL
+GROUP BY ODATE)
+SELECT  ONUM, ABS(AMT-diff) FROM RAZ 
+JOIN ORDERS ON RAZ.ODATE = ORDERS.ODATE
+GROUP  BY ONUM, ABS(AMT-diff)
+ORDER BY ONUM;
+
+Задание № 5.1
+Написать запрос, который делает все города проживания клиентов, начинающиеся с S, написанными большими буквами, затем откатывает изменения.
+
+ЗАПРОС:
+UPDATE CLIENTS SET city = UPPER(city)
+WHERE city LIKE 'S%';
+ROLLBACK;
+
+Задание № 5.2
+Написать запрос, который добавляет нового продавца (поле CITY заполнить NULL). После завершить транзакцию.
+
+ЗАПРОС:
+INSERT INTO SALES (snum, sname, city, COMM)
+VALUES (1557, 'Fedor', NULL, 2);
+
+Задание № 5.3
+Написать запрос, который удаляет всех продавцов (в MySQL синтаксисе это делается через DELETE FROM table_name), у которых не указан город проживания, а также тех, чьи имена длиннее пяти букв. 
+После этого завершить транзакцию.
+
+
+ЗАПРОС:
+DELETE SALES WHERE city IS NULL AND LENGTH(sname) > 5;
+
