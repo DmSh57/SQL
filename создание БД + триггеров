@@ -1,0 +1,344 @@
+CREATE TABLE class ( 
+			class_id INTEGER PRIMARY KEY AUTOINCREMENT,
+			class_name VARCHAR (10) NOT NULL
+, date_created DATETIME, user_created VARCHAR(50), date_updated DATETIME, user_updated VARCHAR(50), is_deleted BOOLEAN);
+
+
+CREATE TABLE classroom ( 
+			classroom_id INTEGER PRIMARY KEY AUTOINCREMENT,
+			number_classroom INTEGER NOT NULL
+, date_created_classroom DATETIME, user_created_classroom VARCHAR(50), date_updated_classroom DATETIME, user_updated_classroom VARCHAR(50), is_deleted_classroom BOOLEAN);
+
+
+CREATE TABLE results ( 
+			results_id INTEGER PRIMARY KEY AUTOINCREMENT,
+			student_id INTEGER NOT NULL,
+			subject_id INTEGER NOT NULL,
+			semester VARCHAR (10),
+			score INTEGER, date_created_results DATETIME, user_created_results VARCHAR(50), date_updated_results DATETIME, user_updated_results VARCHAR(50), is_deleted_results BOOLEAN,
+FOREIGN KEY (student_id) REFERENCES student(student_id),
+FOREIGN KEY (subject_id) REFERENCES subject(subject_id)
+);
+
+
+CREATE TABLE student ( 
+			student_id INTEGER PRIMARY KEY AUTOINCREMENT,
+			full_name VARCHAR (30) NOT NULL,
+			class_id INTEGER NOT NULL,
+			date_of_birth DATE NOT NULL,
+			address VARCHAR (100) NOT NULL,
+			tel_number INTEGER NOT NULL, date_created_student DATETIME, user_created_student VARCHAR(50), date_updated_student DATETIME, user_updated_student VARCHAR(50), is_deleted_student BOOLEAN,
+			FOREIGN KEY (class_id) REFERENCES class(class_id)
+);
+
+
+CREATE TABLE subject (
+			subject_id INTEGER PRIMARY KEY AUTOINCREMENT, 
+			subject_name VARCHAR (50) NOT NULL
+, date_created_subject DATETIME, user_created_subject VARCHAR(50), date_updated_subject DATETIME, user_updated_subject VARCHAR(50), is_deleted_subject BOOLEAN);
+
+
+CREATE TABLE teacher ( 
+			teacher_id INTEGER PRIMARY KEY AUTOINCREMENT,
+			full_name VARCHAR (50) NOT NULL,
+			date_of_birth DATE NOT NULL,
+			address VARCHAR (100) NOT NULL,
+			tel_number INTEGER NOT NULL		
+, date_created_teacher DATETIME, user_created_teacher VARCHAR(50), date_updated_teacher DATETIME, user_updated_teacher VARCHAR(50), is_deleted_teacher BOOLEAN);
+
+
+
+CREATE TABLE timetable (
+			timetable_id INTEGER PRIMARY KEY AUTOINCREMENT,
+			date_of_study DATE NOT NULL,
+			class_id INTEGER NOT NULL,
+			subject_id INTEGER NOT NULL,
+			teacher_id INTEGER NOT NULL,
+			classroom_id INTEGER NOT NULL, date_created_timetable DATETIME, user_created_timetable VARCHAR(50), date_updated_timetable DATETIME, user_updated_timetable VARCHAR(50), is_deleted_timetable BOOLEAN,
+FOREIGN KEY (class_id) REFERENCES class(class_id),
+FOREIGN KEY (subject_id) REFERENCES subject(subject_id)
+FOREIGN KEY (teacher_id) REFERENCES teacher(teacher_id),
+FOREIGN KEY (classroom_id) REFERENCES classroom (classroom_id)
+);
+
+
+CREATE TRIGGER set_date_created AFTER INSERT 
+ON class 
+FOR EACH ROW 
+WHEN (NEW.date_created IS NULL)
+BEGIN 
+	UPDATE class SET date_created = DATETIME('now') WHERE class_id = NEW.class_id;
+END;
+
+CREATE TRIGGER set_date_updated AFTER UPDATE OF class_name  
+ON class 
+FOR EACH ROW 
+WHEN (NEW.date_updated IS NULL)
+BEGIN 
+	UPDATE class SET date_updated = DATETIME('now') WHERE class_name  = NEW.class_name;
+END;
+
+CREATE TRIGGER set_is_deleted AFTER DELETE 
+ON class 
+FOR EACH ROW 
+BEGIN 
+	INSERT INTO class (class_id, class_name, date_created, user_created, date_updated, user_updated, is_deleted) 
+	VALUES (OLD.class_id, OLD.class_name, OLD.date_created, OLD.user_created, OLD.date_updated, OLD.user_updated, True);
+END;
+
+CREATE TRIGGER set_user_created AFTER INSERT 
+ON class 
+FOR EACH ROW 
+WHEN (NEW.date_created IS NULL)
+BEGIN 
+	UPDATE class SET user_created = 'teacher' WHERE class_id = NEW.class_id;
+END;
+
+CREATE TRIGGER set_user_updated AFTER UPDATE OF class_name
+ON class 
+FOR EACH ROW 
+WHEN (NEW.date_updated IS NULL)
+BEGIN 
+	UPDATE class SET user_updated = 'expert' WHERE class_name = NEW.class_name;
+END;
+
+CREATE TRIGGER set_date_created_classroom AFTER INSERT 
+ON classroom 
+FOR EACH ROW 
+WHEN (NEW.date_created_classroom IS NULL)
+BEGIN 
+	UPDATE classroom SET date_created_classroom  = DATETIME('now') WHERE classroom_id  = NEW.classroom_id;
+END;
+
+CREATE TRIGGER set_date_updated_classroom AFTER UPDATE OF number_classroom 
+ON classroom 
+FOR EACH ROW 
+WHEN (NEW.date_updated_classroom IS NULL)
+BEGIN 
+	UPDATE classroom  SET date_updated_classroom = DATETIME('now') WHERE number_classroom  = NEW.number_classroom;
+END;
+
+CREATE TRIGGER set_is_deleted_classroom AFTER DELETE 
+ON classroom 
+FOR EACH ROW 
+BEGIN 
+	INSERT INTO classroom  (classroom_id, number_classroom, date_created_classroom, user_created_classroom, date_updated_classroom, user_updated_classroom, is_deleted_classroom) 
+	VALUES (OLD.classroom_id, OLD.number_classroom, OLD.date_created_classroom, OLD.user_created_classroom, OLD.date_updated_classroom, OLD.user_updated_classroom,  True);
+END;
+
+CREATE TRIGGER set_user_created_classroom AFTER INSERT 
+ON classroom 
+FOR EACH ROW 
+WHEN (NEW.date_created_classroom IS NULL)
+BEGIN 
+	UPDATE classroom  SET user_created_classroom = 'teacher' WHERE classroom_id  = NEW.classroom_id;
+END;
+
+REATE TRIGGER set_user_updated_classroom AFTER UPDATE OF number_classroom 
+ON classroom 
+FOR EACH ROW 
+WHEN (NEW.date_updated_classroom IS NULL)
+BEGIN 
+	UPDATE classroom  SET user_updated_classroom = 'expert' WHERE number_classroom  = NEW.number_classroom;
+END;
+
+CREATE TRIGGER set_date_created_results AFTER INSERT 
+ON results
+FOR EACH ROW 
+WHEN (NEW.date_created_results IS NULL)
+BEGIN 
+	UPDATE results SET date_created_results = DATETIME('now') WHERE results_id = NEW.results_id;
+END;
+
+CREATE TRIGGER set_date_updated_results AFTER UPDATE OF student_id, subject_id, semester, score
+ON results 
+FOR EACH ROW 
+WHEN (NEW.date_updated_results IS NULL)
+BEGIN 
+	UPDATE results  SET date_updated_results = DATETIME('now') WHERE student_id = NEW.student_id OR subject_id = NEW.subject_id OR semester = NEW.semester OR score = NEW.score;
+END;
+
+CREATE TRIGGER set_is_deleted_results AFTER DELETE 
+ON results
+FOR EACH ROW 
+BEGIN 
+	INSERT INTO results (results_id, student_id, subject_id, semester, score, date_created_results, user_created_results, date_updated_results, user_updated_results, is_deleted_results) 
+	VALUES (OLD.results_id, OLD.student_id, OLD.subject_id, OLD.semester, OLD.score, OLD.date_created_results, OLD.user_created_results, OLD.date_updated_results, OLD.user_updated_results, True);
+END;
+
+CREATE TRIGGER set_user_created_results AFTER INSERT 
+ON results 
+FOR EACH ROW 
+WHEN (NEW.date_created_results IS NULL)
+BEGIN 
+	UPDATE results  SET user_created_results = 'teacher' WHERE results_id  = NEW.results_id;
+END;
+
+CREATE TRIGGER set_user_updated_results AFTER UPDATE OF semester, score 
+ON results
+FOR EACH ROW 
+WHEN (NEW.date_updated_results IS NULL)
+BEGIN 
+	UPDATE results  SET user_updated_results = 'expert' WHERE semester = NEW.semester OR score = NEW.score;
+END;
+
+CREATE TRIGGER set_date_created_subject AFTER INSERT 
+ON subject 
+FOR EACH ROW 
+WHEN (NEW.date_created_subject IS NULL)
+BEGIN 
+	UPDATE subject SET date_created_subject  = DATETIME('now') WHERE subject_id  = NEW.subject_id;
+END;
+
+CREATE TRIGGER set_date_updated_subject AFTER UPDATE OF subject_name 
+ON subject 
+FOR EACH ROW 
+WHEN (NEW.date_updated_subject IS NULL)
+BEGIN 
+	UPDATE subject SET date_updated_subject = DATETIME('now') WHERE number_subject = NEW.number_subject;
+END;
+
+CREATE TRIGGER set_is_deleted_subject AFTER DELETE 
+ON subject 
+FOR EACH ROW 
+BEGIN 
+	INSERT INTO subject (subject_id, subject_name, date_created_subject, user_created_subject, date_updated_subject, user_updated_subject, is_deleted_subject) 
+	VALUES (OLD.subject_id, OLD.subject_name, OLD.date_created_subject, OLD.user_created_subject, OLD.date_updated_subject, OLD.user_updated_subject, True);
+END;
+
+CREATE TRIGGER set_user_created_subject AFTER INSERT 
+ON subject 
+FOR EACH ROW 
+WHEN (NEW.date_created_subject IS NULL)
+BEGIN 
+	UPDATE subject  SET user_created_subject = 'teacher' WHERE subject_id = NEW.subject_id;
+END;
+
+CREATE TRIGGER set_user_updated_subject AFTER UPDATE OF subject_name  
+ON subject 
+FOR EACH ROW 
+WHEN (NEW.date_updated_subject IS NULL)
+BEGIN 
+	UPDATE subject SET user_updated_subject = 'expert' WHERE subject_name = NEW.subject_name;
+END;
+
+CREATE TRIGGER set_date_created_teacher AFTER INSERT 
+ON teacher 
+FOR EACH ROW 
+WHEN (NEW.date_created_teacher IS NULL)
+BEGIN 
+	UPDATE teacher SET date_created_teacher = DATETIME('now') WHERE teacher_id  = NEW.teacher_id;
+END;
+
+CREATE TRIGGER set_date_updated_teacher AFTER UPDATE OF full_name, date_of_birth, address, tel_number 
+ON teacher 
+FOR EACH ROW 
+WHEN (NEW.date_updated_teacher IS NULL)
+BEGIN 
+	UPDATE teacher SET date_updated_teacher = DATETIME('now') WHERE full_name = NEW.full_name OR date_of_birth = NEW.date_of_birth OR address = NEW.address OR tel_number = NEW.tel_number;
+END;
+
+CREATE TRIGGER set_is_deleted_teacher AFTER DELETE 
+ON teacher 
+FOR EACH ROW 
+BEGIN 
+	INSERT INTO teacher (teacher_id, full_name, date_of_birth, address, tel_number, date_created_teacher, user_created_teacher, date_updated_teacher, user_updated_teacher, is_deleted_teacher) 
+	VALUES (OLD.teacher_id, OLD.full_name, OLD.date_of_birth, OLD.address, OLD.tel_number, OLD.date_created_teacher, OLD.user_created_teacher, OLD.date_updated_teacher, OLD.user_updated_teacher, True);
+END;
+
+CREATE TRIGGER set_user_created_teacher AFTER INSERT 
+ON teacher 
+FOR EACH ROW 
+WHEN (NEW.date_created_teacher IS NULL)
+BEGIN 
+	UPDATE teacher SET user_created_teacher = 'teacher' WHERE teacher_id = NEW.teacher_id;
+END;
+
+CREATE TRIGGER set_user_updated_teacher AFTER UPDATE OF full_name, date_of_birth, address, tel_number 
+ON teacher 
+FOR EACH ROW 
+WHEN (NEW.date_updated_teacher IS NULL)
+BEGIN 
+	UPDATE teacher SET user_updated_teacher = 'expert' WHERE full_name = NEW.full_name OR date_of_birth = NEW.date_of_birth OR address = NEW.address OR tel_number = NEW.tel_number;
+END;
+
+CREATE TRIGGER set_date_created_timetable AFTER INSERT 
+ON timetable 
+FOR EACH ROW 
+WHEN (NEW.date_created_timetable IS NULL)
+BEGIN 
+	UPDATE timetable SET date_created_timetable = DATETIME('now') WHERE timetable_id  = NEW.timetable_id;
+END;
+
+CREATE TRIGGER set_date_updated_timetable AFTER UPDATE OF date_of_study, class_id, subject_id, teacher_id, classroom_id
+ON timetable 
+FOR EACH ROW 
+WHEN (NEW.date_updated_timetable IS NULL)
+BEGIN 
+	UPDATE timetable SET date_updated_timetable = DATETIME('now') WHERE date_of_study = NEW.date_of_study OR class_id = NEW.class_id OR subject_id = NEW.subject_id OR teacher_id = NEW.teacher_id OR classroom_id = NEW.classroom_id;
+END;
+
+CREATE TRIGGER set_is_deleted_timetable AFTER DELETE 
+ON timetable 
+FOR EACH ROW 
+BEGIN 
+	INSERT INTO timetable  (timetable_id, date_of_study, class_id, subject_id, teacher_id, classroom_id, date_created_timetable, user_created_timetable, date_updated_timetable, user_updated_timetable, is_deleted_timetable) 
+	VALUES (OLD.timetable_id, OLD.date_of_study, OLD.class_id, OLD.subject_id, OLD.teacher_id, OLD.classroom_id, OLD.date_created_timetable, OLD.user_created_timetable, OLD.date_updated_timetable, OLD.user_updated_timetable, True);
+END;
+
+CREATE TRIGGER set_user_created_timetable AFTER INSERT 
+ON timetable 
+FOR EACH ROW 
+WHEN (NEW.date_created_timetable IS NULL)
+BEGIN 
+	UPDATE timetable SET user_created_timetable = 'teacher' WHERE timetable_id = NEW.timetable_id;
+END;
+
+CREATE TRIGGER set_user_updated_timetable AFTER UPDATE OF date_of_study, class_id, subject_id, teacher_id, classroom_id
+ON timetable 
+FOR EACH ROW 
+WHEN (NEW.date_updated_timetable IS NULL)
+BEGIN 
+	UPDATE timetable SET user_updated_timetable = 'expert' WHERE date_of_study = NEW.date_of_study OR class_id = NEW.class_id OR subject_id = NEW.subject_id OR teacher_id = NEW.teacher_id OR classroom_id = NEW.classroom_id;
+END;
+
+CREATE TRIGGER set_date_created_student AFTER INSERT 
+ON student
+FOR EACH ROW 
+WHEN (NEW.date_created_student IS NULL)
+BEGIN 
+	UPDATE student SET date_created_student = DATETIME('now') WHERE student_id = NEW.student_id;
+END;
+
+CREATE TRIGGER set_date_updated_student AFTER UPDATE OF full_name, class_id, date_of_birth, address, tel_number
+ON student
+FOR EACH ROW 
+WHEN (NEW.date_updated_student IS NULL)
+BEGIN 
+	UPDATE student SET date_updated_student = DATETIME('now') WHERE full_name = NEW.full_name OR class_id = NEW.class_id OR date_of_birth = NEW.date_of_birth OR address = NEW.address OR tel_number = NEW.tel_number;
+END;
+
+CREATE TRIGGER set_is_deleted_student AFTER DELETE 
+ON student
+FOR EACH ROW 
+BEGIN 
+	INSERT INTO student (student_id, full_name, class_id, date_of_birth, address, tel_number, date_created_student, user_created_student, date_updated_student, user_updated_student, is_deleted_student) 
+	VALUES (OLD.student_id, OLD.full_name, OLD.class_id, OLD.date_of_birth, OLD.address, OLD.tel_number, OLD.date_created_student, OLD.user_created_student, OLD.date_updated_student, OLD.user_updated_student, True);
+END;
+
+CREATE TRIGGER set_user_created_student AFTER INSERT 
+ON student
+FOR EACH ROW 
+WHEN (NEW.date_created_student IS NULL)
+BEGIN 
+	UPDATE student SET user_created_student = 'teacher' WHERE student_id  = NEW.student_id;
+END;
+
+CREATE TRIGGER set_user_updated_student AFTER UPDATE OF full_name, class_id, date_of_birth, address, tel_number
+ON student
+FOR EACH ROW 
+WHEN (NEW.user_updated_student IS NULL)
+BEGIN 
+	UPDATE student SET user_updated_student= 'expert' WHERE full_name = NEW.full_name OR class_id = NEW.class_id OR date_of_birth = NEW.date_of_birth OR address = NEW.address OR tel_number = NEW.tel_number;
+END;
+
